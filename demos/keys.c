@@ -1,3 +1,10 @@
+/*
+	Hexes Terminal Library
+	Key demo.
+
+	Written by Richard Walmsley <richwalm@gmail.com>
+*/
+
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>

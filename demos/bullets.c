@@ -1,3 +1,10 @@
+/*
+	Hexes Terminal Library
+	Bullet demo.
+
+	Written by Richard Walmsley <richwalm@gmail.com>
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
