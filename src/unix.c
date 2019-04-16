@@ -796,9 +796,11 @@ int HexFullFlush(int UseBuffer, int CurX, int CurY)
 		C++;
 	}
 
-	if (UseBuffer)
+	if (UseBuffer) {
 		memcpy(Current->Data, BD, Total * sizeof(HexChar));
-	memset(Damage, 0, Total);
+		memset(Damage, 0, Total);
+		HasDamage = 0;
+	}
 
 	Current->X = Current->W - 1;
 	Current->Y = Current->H - 1;
@@ -808,7 +810,6 @@ int HexFullFlush(int UseBuffer, int CurX, int CurY)
 		MoveCursor(CurX, CurY);
 	}
 
-	HasDamage = 0;
 	fflush(stdout);
 	return 1;
 }
