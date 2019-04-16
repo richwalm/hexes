@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 
 	Quit = Frames = 0;
 	do {
-		Char = HexGetChar(33, NULL);
+		Char = HexGetChar(SLEEP_TIME, NULL);
 		switch (Char) {
 			default:
 				Quit = 1;
