@@ -3,7 +3,8 @@
 	Windows console handling functions.
 
 	The Windows console is quite limited and performance is subpar.
-	As the terminal grows in size, the slower it takes to draw.
+	The larger the terminal size, the slower its speed.
+	Any cursor optimization we do on *unix is wasted here. Pity.
 
 	Written by Richard Walmsley <richwalm@gmail.com>
 */
