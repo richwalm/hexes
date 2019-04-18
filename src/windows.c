@@ -453,7 +453,8 @@ int HexGetChar(int Timeout, int *Mods)
 
 			case MOUSE_EVENT:
 				if (InputRecord.Event.MouseEvent.dwEventFlags == MOUSE_HWHEELED) {	/* We won't report these. */
-					Milliseconds = NewTimeout(Start, Timeout);
+					if (Timeout > 0)
+						Milliseconds = NewTimeout(Start, Timeout);
 					continue;
 				}
 				MouseEvent = InputRecord.Event.MouseEvent;
