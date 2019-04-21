@@ -874,7 +874,7 @@ int HexResize(int *W, int *H)
 	struct winsize Size;
 	int Return;
 
-	printf(ESC "[8;%d;%dt", *W, *H);
+	printf(ESC "[8;%d;%dt", *H, *W);
 	fflush(stdout);
 
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &Size) == -1)
