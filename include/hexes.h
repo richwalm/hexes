@@ -112,6 +112,7 @@ void HexBlitRaw(const HexBuffer *S, HexBuffer *D, int SX, int SY, int DW, int DY
 void HexBlit(const HexBuffer *S, HexBuffer *D, int SX, int SY, int DW, int DY, int W, int H, unsigned int Flags);
 void HexFillRaw(HexBuffer *D, int DX, int DY, int W, int H, const HexChar *Char, unsigned int Flags);
 void HexFill(HexBuffer *D, int DX, int DY, int W, int H, const HexChar *Char, unsigned int Flags);
+void HexPutHexCharOffset(HexBuffer *D, unsigned int DOffset, const HexChar *Char);
 void HexPutHexChar(HexBuffer *D, int X, int Y, const HexChar *Char);
 
 /* Flushing. */

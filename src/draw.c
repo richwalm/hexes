@@ -131,16 +131,22 @@ int HexPrint(HexBuffer *B, const char *String, size_t Length)
 	return I;
 }
 
+void HexPutHexCharOffset(HexBuffer *D, unsigned int DOffset, const HexChar *Char)
+{
+	D->Data[DOffset] = *Char;
+
+	if (D == Buffer)
+		HasDamage = Damage[DOffset] = 1;
+
+	return;
+}
+
 void HexPutHexChar(HexBuffer *D, int X, int Y, const HexChar *Char)
 {
 	unsigned int DOffset;
 
 	DOffset = GetOffset(X, Y, D->W);
-
-	D->Data[DOffset] = *Char;
-
-	if (D == Buffer)
-		HasDamage = Damage[DOffset] = 1;
+	HexPutHexCharOffset(D, DOffset, Char);
 
 	return;
 }
