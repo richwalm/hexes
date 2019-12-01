@@ -7,7 +7,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef _WIN32
 #include <time.h>
+#else
+#include <sysinfoapi.h>
+#endif
 #include <hexes.h>
 
 #define MAX_BULLETS_RATIO		3	/* Maximum cells on screen divided by this number. */
@@ -134,9 +138,9 @@ static int SetupBullets()
 
 static int DoHit(Bullet *B)
 {
-	Bullet *New;
-
 	if (B->ToSpawn) {
+		Bullet *New;
+
 		B->ToSpawn--;
 		
 		New = NewBullet();
@@ -253,13 +257,18 @@ static void UpdateBullets(Time Now)
 
 static Time GetTS()
 {
-	struct timespec TimeSpec;
 	Time TS;
+
+	#ifndef _WIN32
+	struct timespec TimeSpec;
 
 	if (clock_gettime(CLOCK_MONOTONIC, &TimeSpec) == -1)
 		return 0;
 
 	TS = TimeSpec.tv_sec * 1000 + TimeSpec.tv_nsec / 1000000;
+	#else
+	TS = GetTickCount();
+	#endif
 
 	return TS - StartTime;
 }

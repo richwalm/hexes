@@ -333,14 +333,14 @@ int HexChangeFlags(int *NewFlags)
 
 static int NewTimeout(DWORD Start, DWORD Timeout)
 {
-	DWORD Current, Change, Milliseconds;
+	DWORD CurrentTime, Change, Milliseconds;
 
 	/* Recalculate the timeout. */
-	Current = GetTickCount();
-	if (Start > Current)	/* Overflow. */
-		Change = (UINT_MAX - Start) + Current;
+	CurrentTime = GetTickCount();
+	if (Start > CurrentTime)	/* Overflow. */
+		Change = (UINT_MAX - Start) + CurrentTime;
 	else
-		Change = Current - Start;
+		Change = CurrentTime - Start;
 
 	if (Timeout - Change > 0)
 		Milliseconds = Timeout - Change;
