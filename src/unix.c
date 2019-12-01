@@ -764,6 +764,7 @@ int HexFlush(int CurX, int CurY)
 			D++;
 		}
 
+		HasDamage = 0;
 	}
 
 	if (CurX >= 0) {
@@ -771,7 +772,6 @@ int HexFlush(int CurX, int CurY)
 		MoveCursor(CurX, CurY);
 	}
 
-	HasDamage = 0;
 	fflush(stdout);
 	return 1;
 }

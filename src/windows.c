@@ -268,31 +268,38 @@ void FreeSub()
 
 int HexFlush(int CurX, int CurY)
 {
-	int I;
-	const size_t Total = Width * Height;
-	char *D = Damage;
-	HexChar *B = Current->Data, *BD = Buffer->Data;
+	if (HasDamage) {
+		int I;
+		const size_t Total = Width * Height;
+		char *D = Damage;
+		HexChar *B = Current->Data, *BD = Buffer->Data;
 
-	for (I = 0; I < Total; I++) {
-		if (*D) {
-			*D = 0;
+		for (I = 0; I < Total; I++) {
+			if (*D) {
+				*D = 0;
 
-			if (IsSameChar(&B[I], &BD[I])) {
-				D++;
-				continue;
+				if (IsSameChar(&B[I], &BD[I])) {
+					D++;
+					continue;
+				}
+
+				HexCharToWinConsole(&WinConsoleBuffer[I], &BD[I]);
+
+				B[I] = BD[I];
 			}
-
-			HexCharToWinConsole(&WinConsoleBuffer[I], &BD[I]);
-
-			B[I] = BD[I];
+			D++;
 		}
-		D++;
+		HasDamage = 0;
+
+		if (!HexFullFlush(0, CurX, CurY))
+			return 0;
 	}
 
-	HasDamage = 0;
+	if (CurX >= 0) {
+		HexClipCursor(&CurX, &CurY);
+		MoveCursor(CurX, CurY);
+	}
 
-	if (!HexFullFlush(0, CurX, CurY))
-		return 0;
 	return 1;
 }
 
@@ -311,15 +318,11 @@ int HexFullFlush(int UseBuffer, int CurX, int CurY)
 		if (!WriteConsoleOutputW(ConsoleHandle, WinConsoleBuffer, Size, Coord, &Region))
 			return 0;
 	} else {
-		memset(Damage, 0, Width * Height);
-		HasDamage = 0;
+		/* Fully sets the damage so it's copied to the windows buffer. */
+		memset(Damage, 1, Width * Height);
+		HasDamage = 1;
 		if (!HexFlush(CurX, CurY))
 			return 0;
-	}
-
-	if (CurX >= 0) {
-		HexClipCursor(&CurX, &CurY);
-		MoveCursor(CurX, CurY);
 	}
 
 	return 1;
