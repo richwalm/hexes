@@ -294,8 +294,7 @@ int HexFlush(int CurX, int CurY)
 		if (!HexFullFlush(0, CurX, CurY))
 			return 0;
 	}
-
-	if (CurX >= 0) {
+	else if (CurX >= 0) {
 		HexClipCursor(&CurX, &CurY);
 		MoveCursor(CurX, CurY);
 	}
@@ -305,24 +304,30 @@ int HexFlush(int CurX, int CurY)
 
 int HexFullFlush(int UseBuffer, int CurX, int CurY)
 {
-	if (!UseBuffer) {
-		COORD Size = { Width, Height };
-		const COORD Coord = { 0, 0 };
-		SMALL_RECT Region;
+	COORD Size = { Width, Height };
+	const COORD Coord = { 0, 0 };
+	SMALL_RECT Region = { 0, 0, Width, Height };
 
-		Region.Left = 0;
-		Region.Top = 0;
-		Region.Right = Width;
-		Region.Bottom = Height;
+	if (UseBuffer) {
+		int I;
+		const size_t Total = Width * Height;
+		HexChar *B = Current->Data, *BD = Buffer->Data;
 
-		if (!WriteConsoleOutputW(ConsoleHandle, WinConsoleBuffer, Size, Coord, &Region))
-			return 0;
-	} else {
-		/* Fully sets the damage so it's copied to the windows buffer. */
-		memset(Damage, 1, Width * Height);
-		HasDamage = 1;
-		if (!HexFlush(CurX, CurY))
-			return 0;
+		for (I = 0; I < Total; I++) {
+			HexCharToWinConsole(&WinConsoleBuffer[I], &BD[I]);
+			B[I] = BD[I];
+		}
+
+		memset(Damage, 0, Total);
+		HasDamage = 0;
+	}
+
+	if (!WriteConsoleOutputW(ConsoleHandle, WinConsoleBuffer, Size, Coord, &Region))
+		return 0;
+
+	if (CurX >= 0) {
+		HexClipCursor(&CurX, &CurY);
+		MoveCursor(CurX, CurY);
 	}
 
 	return 1;
