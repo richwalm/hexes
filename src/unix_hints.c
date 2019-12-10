@@ -208,14 +208,15 @@ static int LocateTermInfoWithinDir(const char *Term, const char *Dir)
 /* Documented in terminfo(5). */
 int LocateAndLoadTermInfo()
 {
-	char *TermEnv, *Env;
-	char Path[2048];
+	char *Env;
+	char TermEnv[128], Path[2048];
 	int ScannedEtc;
 	const char DefaultPath[] = "/etc/terminfo";
 
-	TermEnv = getenv("TERM");
-	if (!TermEnv)	
-		return 0;
+	Env = getenv("TERM");
+	if (!Env || strlen(Env) >= sizeof(TermEnv))
+		goto End;
+	strcpy(TermEnv, Env);
 
 	Env = getenv("TERMINFO");
 	if (Env)
@@ -280,9 +281,9 @@ int LocateAndLoadTermInfo()
 	if (LocateTermInfoWithinDir(TermEnv, "/usr/share/terminfo"))
 		return 1;
 
+	End:
 	BooleanAmount = StringSize = IntergerAmount = OffsetAmount = 0;
 	Names = NULL;
-
 	return 0;
 }
 
