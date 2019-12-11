@@ -165,7 +165,7 @@ static int LoadTermInfo(const char *Filename)
 	for (I = 0; I < Header.NumberAmount; I++) {
 		int32_t N;
 
-		if (fread(&N, sizeof(N), 1, File) != 1)
+		if (fread(&N, Extended ? sizeof(int32_t) : sizeof(int16_t), 1, File) != 1)
 			goto Err;
 
 		Intergers[I] = Extended ? le32toh(N) : le16toh(N);
