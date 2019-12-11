@@ -42,11 +42,8 @@ int HexInit(int MinW, int MinH, int Flags)
 		return HEX_ERROR_SIZE;
 	}
 
-	if (MinW && Width < MinW) {
-		InitSub(-1);
-		return HEX_ERROR_TOO_SMALL;
-	}
-	if (MinH && Height < MinH) {
+	if ((MinW && Width < MinW) ||
+		(MinH && Height < MinH)) {
 		InitSub(-1);
 		return HEX_ERROR_TOO_SMALL;
 	}
