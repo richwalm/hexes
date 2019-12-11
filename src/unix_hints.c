@@ -17,7 +17,7 @@
 #include <pwd.h>
 
 static char *Names, *Booleans, *Strings;
-static short *Intergers, *Offsets;
+static int *Intergers, *Offsets;
 
 static unsigned int BooleanAmount;
 static unsigned int StringSize;
@@ -31,6 +31,15 @@ static uint16_t le16toh(uint16_t little_endian_16bits)
 	little_endian_16bits = __builtin_bswap16(little_endian_16bits);
 	#endif
 	return little_endian_16bits;
+}
+#endif
+#ifndef le32toh
+static uint32_t le32toh(uint32_t little_endian_32bits)
+{
+	#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
+	little_endian_32bits = __builtin_bswap32(little_endian_32bits);
+	#endif
+	return little_endian_32bits;
 }
 #endif
 
@@ -61,7 +70,7 @@ const char *GetTermInfoString(unsigned int N)
 	if (N >= OffsetAmount)
 		return NULL;
 
-	Offset = Offsets[N];	
+	Offset = Offsets[N];
 	if (Offset < 0)
 		return NULL;
 
@@ -76,13 +85,13 @@ static int LoadTermInfo(const char *Filename)
 		int16_t Magic;
 		int16_t NameSize;
 		int16_t BoolSize;
-		int16_t ShortAmount;
+		int16_t NumberAmount;
 		int16_t StringOffsetAmount;
 		int16_t StringSize;
 	} Header;
+	int Extended;
 	size_t Size;
 	int I;
-	int16_t N;
 
 	File = fopen(Filename, "rb");
 	if (!File)
@@ -94,18 +103,26 @@ static int LoadTermInfo(const char *Filename)
 	}
 
 	/* Basic checks. */
-	if (le16toh(Header.Magic) != 0x11a) {
-		fclose(File);
-		return 0;
+	switch (le16toh(Header.Magic)) {
+		case 0432:
+			Extended = 0;
+			break;
+		case 01036:
+			Extended = 1;
+			break;
+		default:
+			fclose(File);
+			return 0;
 	}
+
 	Header.NameSize = le16toh(Header.NameSize);
 	Header.BoolSize = le16toh(Header.BoolSize);
-	Header.ShortAmount = le16toh(Header.ShortAmount);
+	Header.NumberAmount = le16toh(Header.NumberAmount);
 	Header.StringOffsetAmount = le16toh(Header.StringOffsetAmount);
 	Header.StringSize = le16toh(Header.StringSize);
 	if (Header.NameSize <= 0 ||
 		Header.BoolSize <= 0 ||
-		Header.ShortAmount <= 0 ||
+		Header.NumberAmount <= 0 ||
 		Header.StringOffsetAmount <= 0 ||
 		Header.StringSize <= 0) {
 		fclose(File);
@@ -121,15 +138,15 @@ static int LoadTermInfo(const char *Filename)
 	Booleans = &Names[Header.NameSize];
 	Strings = &Names[Header.NameSize + Header.BoolSize];
 
-	/* Short allocation. */
-	Size = (Header.ShortAmount + Header.StringOffsetAmount) * sizeof(short);
+	/* Number allocation. */
+	Size = (Header.NumberAmount + Header.StringOffsetAmount) * sizeof(int);
 	Intergers = malloc(Size);
 	if (!Intergers) {
 		free(Names);
 		fclose(File);
 		return 0;
 	}
-	Offsets = &Intergers[Header.ShortAmount];
+	Offsets = &Intergers[Header.NumberAmount];
 
 	/* Names. */
 	if (fread(Names, Header.NameSize, 1, File) != 1 ||
@@ -145,23 +162,27 @@ static int LoadTermInfo(const char *Filename)
 		getc(File);
 
 	/* Numbers. */
-	for (I = 0; I < Header.ShortAmount; I++) {
+	for (I = 0; I < Header.NumberAmount; I++) {
+		int32_t N;
+
 		if (fread(&N, sizeof(N), 1, File) != 1)
 			goto Err;
 
-		Intergers[I] = le16toh(N);
+		Intergers[I] = Extended ? le32toh(N) : le16toh(N);
 	}
 
 	/* Offsets. */
 	for (I = 0; I < Header.StringOffsetAmount; I++) {
-		if (fread(&N, sizeof(N), 1, File) != 1)
-			goto Err;
-		N = le16toh(N);
+		int16_t O;
 
-		if (N >= Header.StringSize)
+		if (fread(&O, sizeof(O), 1, File) != 1)
+			goto Err;
+		O = le16toh(O);
+
+		if (O >= Header.StringSize)
 			goto Err;
 
-		Offsets[I] = N;
+		Offsets[I] = O;
 	}
 
 	/* Strings. */
@@ -173,7 +194,7 @@ static int LoadTermInfo(const char *Filename)
 
 	BooleanAmount = Header.BoolSize;
 	StringSize = Header.StringSize;
-	IntergerAmount = Header.ShortAmount;
+	IntergerAmount = Header.NumberAmount;
 	OffsetAmount = Header.StringOffsetAmount;
 
 	return 1;
@@ -284,6 +305,7 @@ int LocateAndLoadTermInfo()
 	End:
 	BooleanAmount = StringSize = IntergerAmount = OffsetAmount = 0;
 	Names = NULL;
+	Intergers = NULL;
 	return 0;
 }
 
