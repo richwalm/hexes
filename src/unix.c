@@ -27,8 +27,6 @@ extern char *Damage;
 extern int HasDamage;
 int Flags;
 
-static size_t OutputBufferSize;
-
 static int OnRightEdge;
 
 static struct sigaction OldResizeHandler, OldContinueHandler;
@@ -407,7 +405,6 @@ int InitSub(int Stage)
 			else
 				fputs(ESC "c", stdout);
 
-			OutputBufferSize = 0;
 			ExtendOutputBuffer();
 
 			Flags = ~(Flags & 0);
@@ -814,19 +811,11 @@ int HexFullFlush(int UseBuffer, int CurX, int CurY)
 	return 1;
 }
 
-/* There's no real way we can ensure that we're the right buffer size for a heavy screen flush, but this should be good enough. */
+/* We'll simply disable the buffer for now. Seems to cause problems on heavy flushes, even with large buffers. */
 int ExtendOutputBuffer()
 {
-	size_t Size;
-
-	Size = (Width * Height) * BUF_BYTES_PER_CELL;
-
-	if (Size > OutputBufferSize) {
-		if (setvbuf(stdout, NULL, _IOFBF, Size))
-			return 0;
-		OutputBufferSize = Size;
-	}
-	
+	if (setvbuf(stdout, NULL, _IONBF, 0))
+		return 0;
 	return 1;
 }
 
