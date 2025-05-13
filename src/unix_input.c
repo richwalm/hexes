@@ -399,7 +399,7 @@ int ContinueInputHandler()
 
 	K = GetTermInfoString(HINT_STR_KEYPAD_XMIT);
 	if (K)
-		printf("%s", K);
+		fputs(K, stdout);
 
 	return 1;
 }
@@ -425,7 +425,7 @@ static void LoadInputHints()
 
 	K = GetTermInfoString(HINT_STR_KEYPAD_XMIT);
 	if (K)
-		printf("%s", K);
+		fputs(K, stdout);
 
 	Valid = 0;
 
@@ -614,7 +614,7 @@ void FreeInput()
 
 	K = GetTermInfoString(HINT_STR_KEYPAD_LOCAL);
 	if (K)
-		printf("%s", K);
+		fputs(K, stdout);
 
 	return;
 }
@@ -758,7 +758,7 @@ int HexEnableMouse(int Type)
 	if (Type > 0) {
 		/* Set mouse protocol. */
 		if (MouseType == HEX_MOUSE_NONE)
-			printf(ESC "[?1015h" ESC "[?1006h");
+			fputs(ESC "[?1015h" ESC "[?1006h", stdout);
 		printf(ESC "[?%dh", Codes[Type - 1]);
 	} else if (MouseType != HEX_MOUSE_NONE)
 		printf(ESC "[?%dl", Codes[MouseType - 1]);

@@ -177,7 +177,7 @@ static int DetectQuirks()
 		return 0;
 
 	/* Can we get the position of the cursor? If not, unable to continue these tests. */
-	printf(ESC "[6n");
+	fputs(ESC "[6n", stdout);
 	fflush(stdout);
 	Return = WaitForReply('R', Buf, sizeof(Buf));
 	if (Return)
@@ -189,8 +189,8 @@ static int DetectQuirks()
 	if (!ParseCursorPosition(Buf, &X, &Y))
 		return -1;
 	if (!X)
-		printf(ESC "[C");
-	printf(ESC "[G" ESC "[6n");
+		fputs(ESC "[C", stdout);
+	fputs(ESC "[G" ESC "[6n", stdout);
 	fflush(stdout);
 	Return = WaitForReply('R', Buf, sizeof(Buf));
 	if (Return)
@@ -200,7 +200,7 @@ static int DetectQuirks()
 		return -1;
 	if (!X) {
 		Quirks |= QUIRK_ABS_COL_CODE;
-		printf(ESC "[C");
+		fputs(ESC "[C", stdout);
 	}
 
 	/* CNL & CPL. We'll presume it has both if either works. */
@@ -244,7 +244,7 @@ int IsUnicodeSupported()
 	if (!(Quirks & QUIRK_CURSOR_POS_CODE) || Width < 3)
 		return -1;
 
-	printf("\r\xe2\x98\x83" ESC "[6n" ESC "[1K\r");
+	fputs("\r\xe2\x98\x83" ESC "[6n" ESC "[1K\r", stdout);
 	fflush(stdout);
 
 	Return = WaitForReply('R', Buf, sizeof(Buf));
@@ -405,7 +405,7 @@ int InitSub(int Stage)
 			if (Hint)
 				printf("%s" ESC "[H", Hint);
 			else
-				printf(ESC "c");
+				fputs(ESC "c", stdout);
 
 			OutputBufferSize = 0;
 			ExtendOutputBuffer();
@@ -448,10 +448,10 @@ void FreeSub()
 
 	Hint = GetTermInfoString(HINT_STR_EXIT_CA_MODE);
 	if (Hint)
-		printf("%s", Hint);
+		fputs(Hint, stdout);
 
 	if (!Hint || GetTermInfoBool(HINT_BOOL_CA_NOT_RESTORE))
-		printf(ESC "c");
+		fputs(ESC "c", stdout);
 
 	fflush(stdout);
 
@@ -574,7 +574,7 @@ static int ChangeCursor(int FG, int BG, unsigned int Attributes)
 	Char[-1] = 'm';	/* Replace the previous semicolon. */
 	Char[0] = '\0';
 
-	printf("%s", EscapeString);
+	fputs(EscapeString, stdout);
 	Current->FG = FG; Current->BG = BG; Current->Attr = Attributes;
 
 	return 1;
@@ -628,7 +628,7 @@ int HexChangeFlags(int *NewFlags)
 	else if (Diff & HEX_FLAG_DISPLAY_BRIGHT_CURSOR && !(Flags & HEX_FLAG_DISPLAY_NO_CURSOR))
 		Hint = GetTermInfoString(HINT_STR_CURSOR_VISIBLE);
 	if (Hint)
-		printf("%s", Hint);
+		fputs(Hint, stdout);
 
 	if (Diff & HEX_FLAG_DISPLAY_REVERSE_VIDEO)
 		/* I particularly dislike terminfo here, never exposing the individual codes for this feature.
@@ -677,14 +677,14 @@ static int MoveCursor(int X, int Y)
 	/* CUU & CUD */
 	} else if (X == CX) {
 		if (OnRightEdge && Quirks & QUIRK_WRAPPING_FIX)
-			printf(ESC "[D" ESC "[C");
+			fputs(ESC "[D" ESC "[C", stdout);
 		Change = Y - CY;
 		sprintf(Char, "%s%c", NS(N, abs(Change)), Change > 0 ? 'B' : 'A');
 	/* CUP* */
 	} else
 		sprintf(Char, "%s;%sH", NS(N, Y + 1), NS(N2, X + 1));
 
-	printf("%s", EscapeString);
+	fputs(EscapeString, stdout);
 	OnRightEdge = 0;
 	Current->X = X; Current->Y = Y;
 
@@ -747,8 +747,8 @@ int HexFlush(int CurX, int CurY)
 				} else if (First && OnRightEdge) {
 					/* If on edge, we'll need to send a NOOP move code in order for the cursor to remain in place. */
 					if (Quirks & QUIRK_WRAPPING_FIX)
-						printf(ESC "[D");
-					printf(ESC "[C");
+						fputs(ESC "[D", stdout);
+					fputs(ESC "[C", stdout);
 					OnRightEdge = 0;
 				}
 				First = 0;
@@ -787,7 +787,7 @@ int HexFullFlush(int UseBuffer, int CurX, int CurY)
 	C = BD;
 
 	/* We can't be certain where the cursor is, so we'll just reset. */
-	printf(ESC "[H");
+	fputs(ESC "[H", stdout);
 
 	for (I = 0; I < Total; I++) {
 		if (NeedsCursorChange(C))
@@ -856,7 +856,7 @@ int ContinueHandler()
 
 	Hint = GetTermInfoString(HINT_STR_ENTER_CA_MODE);
 	if (Hint)
-		printf("%s", Hint);
+		fputs(Hint, stdout);
 
 	PreviousFlags = Flags;
 	Flags = ~Flags;
