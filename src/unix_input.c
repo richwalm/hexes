@@ -96,7 +96,7 @@ enum UnixHints {
 	HINT_STR_KEY_F10 = 67,
 	HINT_STR_KEY_F11 = 216,
 	HINT_STR_KEY_F12 = 217
-} UnixHints;
+};
 
 #define KEY_HINTS	28
 static int ValidKeys;

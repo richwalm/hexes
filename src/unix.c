@@ -68,7 +68,7 @@ enum UnixHints {
 	HINT_STR_CURSOR_INVISIBLE = 13,	/* civis */
 	HINT_STR_CURSOR_NORMAL = 16,	/* cnorm */
 	HINT_STR_CURSOR_VISIBLE = 20	/* cvvis */
-} UnixHints;
+};
 int GetTermInfoBool(unsigned int N);
 int GetTermInfoInt(unsigned int N);
 const char *GetTermInfoString(unsigned int N);
