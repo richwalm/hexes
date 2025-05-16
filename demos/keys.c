@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <hexes.h>
+#include <stdlib.h>
 
 #define	INPUT_TIMEOUT	2000
 
@@ -88,6 +89,7 @@ int main(int argc, char *argv[])
 	int Quit;
 	int Char;
 	const HexChar C = { "", 9, 0, 0 };
+	char *Env;
 
 	if (HexInit(0, 0, 0)) {
 		fputs("Unable to load Hexes!", stderr);
@@ -105,6 +107,11 @@ int main(int argc, char *argv[])
 	HexColor(Buffer, 16, -1);
 	sprintf(Status, "{Unicode: %s} {Colors: %d}", HexUnicode() ? "✔" : "No", HexColors);
 	HexPrint(Buffer, Status, 0);
+	Env = getenv("TERM");
+	if (Env) {
+		sprintf(Status, " {TERM: %s}", Env);
+		HexPrint(Buffer, Status, 0);
+	}
 
 	HexFlush(-1, 0);
 
@@ -137,7 +144,7 @@ int main(int argc, char *argv[])
 				sprintf(Status, " .");
 			} else if (Char == HEX_CHAR_UNKNOWN) {
 				HexColor(Buffer, 3, -1);
-				sprintf(Status, " <UNKNOWN>");
+				sprintf(Status, " <UNKNOWN; '%s'>", &HexGetRawKey(NULL)[1]);
 			} else {
 				HexColor(Buffer, 7, -1);
 				sprintf(Status, " <0x%X>", Char);
