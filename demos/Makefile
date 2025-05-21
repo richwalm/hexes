@@ -5,9 +5,12 @@ LDLIBS=-lhexes
 
 .PHONY: all clean
 
-OBJS=bullets.o keys.o
+OBJS=bullets.o keys.o badapple.o
 
-all: bullets keys
+all: bullets keys badapple
+
+badapple: badapple.c
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(LDLIBS) -lz -o $@
 
 clean:
-	rm -rf bullets keys $(OBJS)
+	rm -rf bullets keys badapple $(OBJS)
