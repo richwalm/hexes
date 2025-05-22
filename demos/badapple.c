@@ -188,7 +188,6 @@ static int Core()
 {
 	unsigned int Number;
 	HexBuffer *TB;
-	const HexChar C = { "?", 2, 3, 0 };
 	int Char;
 
 	LBSize = Width * 2;	/* The two raw lines allows us to use block characters to compress down to a single line. */
@@ -201,7 +200,6 @@ static int Core()
 		free(LB);
 		return 1;
 	}
-	HexFillRaw(Frame, 0, 0, Frame->W, Frame->H, &C, 0);	/* Debugging. */
 
 	TB = HexGetTerminalBuffer();
 	OffsetW = (TB->W / 2) - (Frame->W / 2);
