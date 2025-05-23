@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	Return = HexInit(Width / 2, Height / 2, 0);
+	Return = HexInit(Width / 2, Height / 2, HEX_INIT_NEEDS_UNICODE);
 	if (Return) {
 		if (Return == HEX_ERROR_TOO_SMALL)
 			fprintf(stderr, "Needs a terminal of at least %dx%d.\n", Width / 2, Height / 2);
