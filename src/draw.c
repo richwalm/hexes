@@ -27,7 +27,7 @@ void HexLocate(HexBuffer *B, int X, int Y)
 
 void HexTabStop(HexBuffer *B, unsigned int TabStop)
 {
-	if (!B->TabStop)
+	if (B->TabStop)
 		B->TabStop = TabStop;
 	else
 		B->TabStop = HEX_DEFAULT_TAB_STOP;
@@ -117,7 +117,7 @@ int HexPrint(HexBuffer *B, const char *String, size_t Length)
 					B->X--;
 				break;
 			case '\t':
-				B->W += B->TabStop - (B->X % B->TabStop);
+				B->X += B->TabStop - (B->X % B->TabStop);
 				break;
 			default:
 				Size = HexPutChar(B, String);
